@@ -1,4 +1,5 @@
 #include <iostream>
+#include <climits>
 using namespace std;
 
 class node;
@@ -39,12 +40,11 @@ public:
 
     int exist(linked_list* start, int id_in);
 
-    void prim(node* start1, node*& start2)
-    {
+    void get_smallest_edge(node* start_node, linked_list* start_ll, int*& output);
 
-    }
 };
 
+//////////////////////////
 class node
 {
 private:
@@ -149,6 +149,56 @@ public:
         start=start->next;
         start->show(start);
     }
+
+    void get_smallest_edge(node* start1, node* start2, int*& output)
+    {
+        node* tmp_node=start1;
+        while(tmp_node!=NULL)
+        {
+            if(start2->exist(start2, tmp_node->id))
+            {
+                output[0]=tmp_node->id;
+                tmp_node->related->get_smallest_edge(start2, tmp_node->related, output);
+            }
+
+            tmp_node=tmp_node->next;
+        }
+    }
+
+    //in this function we check if all verteces of start 1 is in start2:
+    int compare_verteces(node* start1, node*start2)
+    {
+        while(start1!=NULL)
+        {
+            if(!start2->exist(start2, start1->id))
+            {
+                return 0;
+            }
+            start1=start1->next;
+        }
+
+        return 1;
+    }
+
+    void prim(node* start1, node*& start2)
+    {
+        if (start2==NULL)
+        {
+            start2->make_node(start2, start1->id);
+
+        }
+        while(!start2->compare_verteces(start1, start2))
+        {
+            int* output=new int[3];
+            output[0]=-1;
+            output[1]=-1;
+            output[2]=INT_MAX;
+
+            start2->get_smallest_edge(start1, start2, output);
+
+            start2->make_graph(start2, output[0], output[1], output[2]);
+        }
+    }
 };
 
 
@@ -167,7 +217,7 @@ void linked_list::show(linked_list* start)
     }
 }
 
-int linked_list::exist(linked_list* start, int id_in)
+int  linked_list::exist(linked_list* start, int id_in)
 {
     if(start==NULL)
     {
@@ -180,6 +230,25 @@ int linked_list::exist(linked_list* start, int id_in)
         start=start->next;
     }
     return 0;
+}
+
+void linked_list::get_smallest_edge(node* start_node, linked_list* start_ll, int*& output)
+{
+    while(start_ll!=NULL)
+    {
+        if(start_ll->length<output[1])
+        {
+            if(!start_node->exist(start_node,
+                                  start_ll->node_item->get_id(
+                                      start_ll->node_item)))
+            {
+                output[1]=start_ll->node_item->get_id(start_ll->node_item);
+                output[2]=start_ll->length;
+            }
+        }
+
+        start_ll=start_ll->next;
+    }
 }
 
 void make_test_graph(node*& start)
@@ -196,15 +265,21 @@ void make_test_graph(node*& start)
 
      start->make_graph(start, 4, 5, 8);
 
-     start->show(start);
+     //start->show(start);
 
 }
 
 
 int main(void)
 {
-    node* start=NULL;
-    make_test_graph(start);
+    node* start1=NULL;
+    make_test_graph(start1);
+
+    node* start2=NULL;
+    cout<<"test: before prim:\n";
+    start2->prim(start1, start2);
+
+    start2->show(start2);
 
 
     return 0;
