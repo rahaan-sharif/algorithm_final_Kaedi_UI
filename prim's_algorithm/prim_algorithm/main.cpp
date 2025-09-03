@@ -182,25 +182,30 @@ int linked_list::exist(linked_list* start, int id_in)
     return 0;
 }
 
+void make_test_graph(node*& start)
+{
+     start->make_graph(start, 1, 5, 1);
+     start->make_graph(start, 1, 3, 2);
+     start->make_graph(start, 1, 2, 3);
 
+     start->make_graph(start, 2, 5, 4);
+     start->make_graph(start, 2, 4, 5);
+
+     start->make_graph(start, 3, 5, 6);
+     start->make_graph(start, 3, 4, 7);
+
+     start->make_graph(start, 4, 5, 8);
+
+     start->show(start);
+
+}
 
 
 int main(void)
 {
     node* start=NULL;
-    start->make_graph(start, 1, 5, 1);
-    start->make_graph(start, 1, 3, 2);
-    start->make_graph(start, 1, 2, 3);
+    make_test_graph(start);
 
-    start->make_graph(start, 2, 5, 4);
-    start->make_graph(start, 2, 4, 5);
-
-    start->make_graph(start, 3, 5, 6);
-    start->make_graph(start, 3, 4, 7);
-
-    start->make_graph(start, 4, 5, 8);
-
-    start->show(start);
 
     return 0;
 }
