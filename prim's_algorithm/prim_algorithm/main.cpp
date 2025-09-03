@@ -40,7 +40,7 @@ public:
 
     int exist(linked_list* start, int id_in);
 
-    void get_smallest_edge(node* start_node, linked_list* start_ll, int*& output);
+    void get_smallest_edge(node* start_node, linked_list* start_ll, int*& output, int loc_id);
 
 };
 
@@ -152,17 +152,30 @@ public:
 
     void get_smallest_edge(node* start1, node* start2, int*& output)
     {
+        cout<<"gest smallest edge(node)\n";
         node* tmp_node=start1;
         while(tmp_node!=NULL)
         {
             if(start2->exist(start2, tmp_node->id))
             {
-                output[0]=tmp_node->id;
-                tmp_node->related->get_smallest_edge(start2, tmp_node->related, output);
+                cout<<"\ttmp_node: "<<tmp_node->id<<" exists"<<endl;
+                int tmp_int=tmp_node->id;
+                tmp_node->related->get_smallest_edge(start2, tmp_node->related, output, tmp_int);
             }
+            else
+            {
+                cout<<"\t  tmp_node: "<<tmp_node->id<<" doesn't exist.\n";
+            }
+
+            cout<<"============\n";
 
             tmp_node=tmp_node->next;
         }
+        cout<<"end end end end\n";
+        cout<<output[0]<<", "<<output[1]<<", "<<output[2]<<endl<<endl<<endl;
+
+        char aaa;
+        cin>>aaa;
     }
 
     //in this function we check if all verteces of start 1 is in start2:
@@ -185,8 +198,8 @@ public:
         if (start2==NULL)
         {
             start2->make_node(start2, start1->id);
-
         }
+
         while(!start2->compare_verteces(start1, start2))
         {
             int* output=new int[3];
@@ -232,18 +245,20 @@ int  linked_list::exist(linked_list* start, int id_in)
     return 0;
 }
 
-void linked_list::get_smallest_edge(node* start_node, linked_list* start_ll, int*& output)
+void linked_list::get_smallest_edge(node* start_node, linked_list* start_ll, int*& output, int loc_id)
 {
     while(start_ll!=NULL)
     {
-        if(start_ll->length<output[1])
+        if(start_ll->length<output[2])
         {
             if(!start_node->exist(start_node,
-                                  start_ll->node_item->get_id(
-                                      start_ll->node_item)))
+                                      start_ll->node_item->get_id(
+                                         start_ll->node_item)))
             {
+                output[0]=loc_id;
                 output[1]=start_ll->node_item->get_id(start_ll->node_item);
                 output[2]=start_ll->length;
+                cout<<"\t\t\t"<<output[0]<<", "<<output[1]<<", "<<output[2]<<endl;
             }
         }
 
@@ -276,7 +291,6 @@ int main(void)
     make_test_graph(start1);
 
     node* start2=NULL;
-    cout<<"test: before prim:\n";
     start2->prim(start1, start2);
 
     start2->show(start2);
