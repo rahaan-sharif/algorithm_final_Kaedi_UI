@@ -2,6 +2,7 @@
 using namespace std;
 
 int binary_search(int* array, int low, int high, int item)
+//low is lower index and hig is higher index
 {
     while(low<=high)
     {
