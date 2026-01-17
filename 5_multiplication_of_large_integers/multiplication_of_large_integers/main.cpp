@@ -1,6 +1,5 @@
 #include <iostream>
 using namespace std;
-#define lli  long long int
 
 class long_integer
 {
@@ -17,26 +16,34 @@ public:
         pow=0;
     }
 
-    void set_length(int length_in)
-    {
-        length=length_in;
-    }
-
-    void set_pow(int pow_in)
-    {
-        pow=pow_in;
-    }
-
-    void set_v(int* v_in)
-    {
-        v=v_in;
-    }
-
-    void set(int* v_in, int length_in, int pow_in)
+    void set(int* v_in, int length_in, int pow_in=0)
     {
         length=length_in;
         pow=pow_in;
         v=v_in;
+
+        int j=0;
+        for(int i=0; i<length; i++)
+        {
+            if(v[i]==0)
+            {
+                j++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        length-=j;
+        v+=j;
+
+        if(length<=0)
+        {
+            length=1;
+            pow=0;
+            v=new int[1];
+            v[0]=0;
+        }
     }
 
     int get_length()
@@ -56,7 +63,6 @@ public:
 
     void show()
     {
-        cout<<"long integer show:  ";
         for(int i=0; i<length; i++)
         {
             cout<<v[i];
@@ -66,7 +72,27 @@ public:
         {
             cout<<0;
         }
-        cout<<endl<<endl;
+    }
+
+    void zero_padding(int new_length)
+    {
+        if(new_length<=length)
+        {
+            return;
+        }
+        int* tmp_v=new int[new_length];
+        for(int i=0; i<new_length; i++)
+        {
+            tmp_v[i]=0;
+        }
+
+        for(int i=0; i<length; i++)
+        {
+            tmp_v[i+(new_length - length)]=v[i];
+        }
+
+        v=tmp_v;
+        length=new_length;
     }
 };
 
@@ -81,9 +107,6 @@ void show_array(int* arr, int length)
 
 long_integer* mul(long_integer* v1, long_integer* v2)
 {
-    v1->show();
-    v2->show();
-
     int n1=v1->get_length();
     int* v1_arr=v1->get_v();
 
@@ -92,18 +115,32 @@ long_integer* mul(long_integer* v1, long_integer* v2)
 
     int n=n1+n2;
 
+    long_integer* output=new long_integer;
+
     int* output_arr=new int[n];
+
+    if((v1->get_length()==1 && v1->get_v()[0]==0) ||
+       (v2->get_length()==1 && v2->get_v()[0]==0))
+    {
+        int* tmp_v=new int[1];
+        tmp_v[0]=0;
+        int tmp_length=1;
+        output->set(tmp_v, tmp_length);
+
+        return output;
+    }
+
     for(int i=0; i<n; i++)
     {
         output_arr[i]=0;
     }
 
     int value_c=1;
-    for(int i=n1-1; i>=0; i--)
+    for(int i=n2-1; i>=0; i--)
     {
-        for(int j=0; j<n2; j++)
+        for(int j=0; j<n1; j++)
         {
-            output_arr[n1+j]+=v2_arr[i]*v1_arr[j]*value_c;
+            output_arr[n2+j]+=v2_arr[i]*v1_arr[j]*value_c;
         }
 
         for(int j=n-1; j>0; j--)
@@ -138,11 +175,8 @@ long_integer* mul(long_integer* v1, long_integer* v2)
 
     int output_pow=v1->get_pow()+v2->get_pow();
 
-    long_integer* output=new long_integer;
     output->set(output_arr, output_length, output_pow);
 
-
-    cout<<"\n\n\n";
     return output;
 }
 
@@ -229,9 +263,6 @@ long_integer* sum(long_integer* v1, long_integer* v2)
 
 long_integer* lim(long_integer* v1, long_integer* v2)    //large integer multiplication
 {
-    cout<<"===\n";
-    cout<<"lim function:\n";
-
     long_integer* output=new long_integer;
 
     if(v1->get_length()==0 || v2->get_length()==0)
@@ -246,36 +277,31 @@ long_integer* lim(long_integer* v1, long_integer* v2)    //large integer multipl
 
     if(n<=2)
     {
-        cout<<"&&&\n";
-        cout<<"sma\n";
-        v1->show();
-        v2->show();
         output=mul(v1, v2);
-        output->show();
-        cout<<endl<<endl;
         return output;
     }
     else
     {
+
         int m=n/2;
 
+        if(n==n1)
+        {
+            v2->zero_padding(n);
+        }
+        else
+        {
+            v1->zero_padding(n);
+        }
+
         long_integer* x=new long_integer;
-        x->set(v1->get_v(),(v1->get_length()-m) , m);
-
         long_integer* y=new long_integer;
-        y->set(v1->get_v()+(v1->get_length()-m), m, 0);
-
         long_integer* w=new long_integer;
-        w->set(v2->get_v(), (v2->get_length()-m), m);
-
         long_integer* z=new long_integer;
-        z->set(v2->get_v()+(v2->get_length()-m), m, 0);
-
-        x->show();
-        y->show();
-        w->show();
-        z->show();
-        cout<<"*:*::\n";
+        x->set(v1->get_v(),(v1->get_length()-m) , m+v1->get_pow());
+        y->set(v1->get_v()+(v1->get_length()-m), m, 0+v1->get_pow());
+        w->set(v2->get_v(), (v2->get_length()-m), m+v2->get_pow());
+        z->set(v2->get_v()+(v2->get_length()-m), m, 0+v2->get_pow());
 
         long_integer* tmp_output1=NULL;
         long_integer* tmp_output2=NULL;
@@ -285,13 +311,6 @@ long_integer* lim(long_integer* v1, long_integer* v2)    //large integer multipl
         tmp_output2=lim(x, z);
         tmp_output3=lim(y, w);
         tmp_output4=lim(y, z);
-        x->show();
-        w->show();
-        tmp_output1->show();
-        cout<<"**\n";
-        x->show();
-        z->show();
-        tmp_output2->show();
 
         long_integer* output1=sum(tmp_output1, tmp_output2);
         long_integer* output2=output=sum(output1, tmp_output3);
@@ -301,12 +320,11 @@ long_integer* lim(long_integer* v1, long_integer* v2)    //large integer multipl
     }
 }
 
-
 int main(void)
 {
 
-    int tmp_length1=5;
-    int tmp_length2=5;
+    int tmp_length1=7;
+    int tmp_length2=9;
 
     long_integer* v1=new long_integer;
     int* v1_arr=new int[tmp_length1];
@@ -314,9 +332,7 @@ int main(void)
     {
         v1_arr[i]=(i*2-3/4*6+1)%10;
     }
-    v1->set_length(tmp_length1);
-    v1->set_v(v1_arr);
-    v1->show();
+    v1->set(v1_arr, tmp_length1);
 
     long_integer* v2=new long_integer;
     int* v2_arr=new int[tmp_length2];
@@ -324,51 +340,18 @@ int main(void)
     {
         v2_arr[i]=(i+1)%10;
     }
-    v2->set_length(tmp_length2);
-    v2->set_v(v2_arr);
-    v2->show();
+    v2->set(v2_arr, tmp_length2);
 
     long_integer* v3=lim(v1, v2);
-    cout<<"========\n=====\n";
-    v3->show();
-    cout<<"end of programm\n";
 
-
-
-    return 0;
-}
-
-
-
-/*
-int main(void)
-{
-
-    int tmp_length1=2;
-    int tmp_length2=2;
-
-    long_integer* v1=new long_integer;
-    int* v1_arr=new int[tmp_length1];
-    v1_arr[0]=1;
-    v1_arr[1]=2;
-    v1->set_length(tmp_length1);
-    v1->set_v(v1_arr);
     v1->show();
-
-    long_integer* v2=new long_integer;
-    int* v2_arr=new int[tmp_length2];
-    v2_arr[0]=1;
-    v2_arr[1]=3;
-    v2->set_length(tmp_length2);
-    v2->set_v(v2_arr);
+    cout<<" * ";
     v2->show();
-
-    long_integer* v3=lim(v1, v2);
+    cout<<" = ";
     v3->show();
-    cout<<"end of programm\n";
+    cout<<endl<<endl;
 
 
 
     return 0;
 }
-*/
