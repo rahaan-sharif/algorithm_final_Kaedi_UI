@@ -194,6 +194,27 @@ void mcm(int**& arr, int* l, int count)      //matrix chain multiplication
         matrices[i]=new d(l[i], l[i+1], arr[i]);
     }
 
+    element** table=new element*[count*count];
+    for(int i=0; i<count*count; i++)
+    {
+        table[i]=new element;
+    }
+
+    for(int i=0; i<count; i++)
+    {
+        for(int j=0; j<count; j++)
+        {
+            if((j+i)<count)
+            {
+                int tmp1=j, tmp2=j+i;
+                //cout<<"("<<j<<","<<j+i<<") -> ";
+
+            }
+        }
+
+        cout<<endl;
+    }
+
 
 
 }
@@ -216,9 +237,6 @@ int main(void)
     }
 
     mcm(arr, l, mat_count);
-
-    element** table=NULL;
-
 
 
     return 0;
