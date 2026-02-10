@@ -1,3 +1,16 @@
+i have to replace k with k+1.
+I have to change mcm function.
+
+
+
+
+
+
+
+
+
+
+
 #include <iostream>
 using namespace std;
 #define mat_count 6
@@ -78,107 +91,31 @@ public:
     }
 };
 
-class linked_list
-{
-private:
-    int l1, l2;
-    linked_list* next;
-
-public:
-    linked_list(int l1_in=0, int l2_in=0)
-    {
-        l1=l1_in;
-        l2=l2_in;
-        next=NULL;
-    }
-
-    void make_list(linked_list*& start, int l1_in, int l2_in)
-    {
-        if(start==NULL)
-        {
-            start=new linked_list(l1_in, l2_in);
-            return;
-        }
-        else
-        {
-            linked_list* tmp_ll=start;
-            while(tmp_ll->next!=NULL)
-            {
-                tmp_ll=tmp_ll->next;
-            }
-            tmp_ll->next=new linked_list(l1_in, l2_in);
-            return;
-        }
-    }
-
-    void copy(linked_list*& start1, linked_list*& start2)
-    {
-        linked_list* tmp_ll=start2;
-        while(tmp_ll!=NULL)
-        {
-            start1->make_list(start1, start2->l1, start2->l2);
-            tmp_ll=tmp_ll->next;
-        }
-    }
-
-    void concat_2_lists(linked_list*& start1, linked_list*& start2, linked_list*& start3)
-    {
-        //concat start2 with start3 and copy it to start1;
-
-        start1=NULL;
-
-        if(start2==NULL && start3==NULL)
-        {
-            return;
-        }
-        else if(start2==NULL)
-        {
-            start1->copy(start1, start2);
-            return;
-        }
-        else if(start3==NULL)
-        {
-            start1->copy(start1, start2);
-            return;
-        }
-        else
-        {
-            start1->copy(start1, start2);
-            start1->copy(start1, start3);
-            return;
-        }
-
-    }
-
-    void show(linked_list* start)
-    {
-        while(start!=NULL)
-        {
-            cout<<"("<<start->l1<<", "<<start->l2<<") -> ";
-            start=start->next;
-        }
-    }
-};
-
-
 class bst              //binary search tree
 {
 private:
+    int multiplications;   //number of multiplications till here.
     int l1, l2;
     bst* left, *right;
 
 public:
-    bst(int l1_in=0, int l2_in=0)
+    bst(int mul_in, int l1_in=0, int l2_in=0)
     {
         l1=l1_in;
         l2=l2_in;
+        multiplications=mul_in;
         right=NULL;
         left=NULL;
     }
 
-    void set_value(bst*& start, int l1_in, int l2_in)
+    void set_value(bst*& start, int mul_in, int l1_in, int l2_in)
     {
-        start=new bst(l1_in, l2_in);
+        start=new bst(mul_in, l1_in, l2_in);
+    }
+
+    int get_value(bst*& start)
+    {
+        return start->multiplications;
     }
 
     void add_right(bst*& start1, bst*& start2)
@@ -222,13 +159,14 @@ class element
 {
 private:
     d* matrix;
-    linked_list* path;
-    int value;
+    bst* bst_path;
+    //linked_list* path;
+    //int value;           number of multiplications till here.
 
 public:
     element()
     {
-        path=NULL;
+        bst_path=NULL;
         value=0;
         matrix=NULL;
     }
@@ -242,28 +180,46 @@ public:
         int tmp_l2=start2->matrix->get_l1(start2->matrix);
         int tmp_l3=start3->matrix->get_l2(start3->matrix);
         int tmp_value=tmp_l1*tmp_l2*tmp_l3;
-        tmp_value+=(start2->value  +  start3->value);
+        tmp_value+=start2->get_value(start2);
+        tmp_value+=start3->get_value(start3);
 
-        linked_list* tmp_path=new linked_list;
-        tmp_path->concat_2_lists(tmp_path, start2->path, start2->path);
+        bst* tmp_path=new bst(0, 0, 0);
+        tmp_path->set_value(tmp_path, tmp_value,
+                            start2->matrix->get_l1(start2->matrix),
+                            start3->matrix->get_l2(start3->matrix));
+
+        tmp_path->add_left(tmp_path, start2->bst_path);
+        tmp_path->add_right(tmp_path, start3->bst_path);
+
+        start1->matrix=tmp_d;
+        start1->bst_path=tmp_path;
+
+        //linked_list* tmp_path=new linked_list;
+        //tmp_path->concat_2_lists(tmp_path, start2->path, start2->path);
     }
 
-    void add_path(element*& start, d* node_in)
+    int get_value(element*& start)
     {
-        start->path->make_list(start->path, node_in);  // باید یک ساختتار درختی باشد. این اشتباه است.
+        return start->bst_path->get_value(start->bst_path);
     }
 
-    element* get_relation(element**& start, int count,
-                     int*& arr, int i, int j, int k)
+    void get_relation(element**& start, int count,
+                      int i, int j, int k)
     {
         int tmp_int=-1;
-        tmp_int=start[(i*count)+k]->value;
-        tmp_int+=start[(k*count)+j]->value;
-        tmp_int+=(arr[i-1]*arr[k]*arr[j]);
+        tmp_int=start[(i*count)+k]->get_value(start[(i*count)+k]);
+        tmp_int+=start[(k*count)+j]->get_value(start[(k*count)+j]);
+        int tmp_int1=start[(i*count)+k]->matrix->get_l1(start[(i*count)+k]->matrix) ;
+        int tmp_int2=start[(i*count)+k]->matrix->get_l2(start[(i*count)+k]->matrix) ;
+        int tmp_int3=start[(k*count)+j]->matrix->get_l2(start[(k*count)+j]->matrix) ;
+        tmp_int+=(tmp_int1*tmp_int2*tmp_int3);
 
-        element* output=new element;
-        output->set_element(output, start[(i*count)+k], start[(k*count)+j]);
-        return output;
+        if(start[(i*count)+j]->get_value(start[(i*count)+j]) > tmp_int)
+        {
+            start[(i*count)+j]->set_element(start[(i*count)+j],
+                                            start[(i*count)+k],
+                                            start[(k*count)+j]);
+        }
     }
 };
 
