@@ -111,25 +111,43 @@ public:
         }
     }
 
-    void concat_2_lists(linked_list*& start1, linked_list*& start2)
+    void copy(linked_list*& start1, linked_list*& start2)
     {
-        if(start2==NULL)
+        linked_list* tmp_ll=start2;
+        while(tmp_ll!=NULL)
+        {
+            start1->make_list(start1, start2->l1, start2->l2);
+            tmp_ll=tmp_ll->next;
+        }
+    }
+
+    void concat_2_lists(linked_list*& start1, linked_list*& start2, linked_list*& start3)
+    {
+        //concat start2 with start3 and copy it to start1;
+
+        start1=NULL;
+
+        if(start2==NULL && start3==NULL)
         {
             return;
         }
-        else if(start1==NULL)
+        else if(start2==NULL)
         {
-            start1=start2;
+            start1->copy(start1, start2);
+            return;
+        }
+        else if(start3==NULL)
+        {
+            start1->copy(start1, start2);
+            return;
         }
         else
         {
-            linked_list* tmp_ll=start1;
-            while(tmp_ll->next!=NULL)
-            {
-                tmp_ll=tmp_ll->next;
-            }
-            tmp_ll->next=start2;
+            start1->copy(start1, start2);
+            start1->copy(start1, start3);
+            return;
         }
+
     }
 
     void show(linked_list* start)
@@ -140,6 +158,64 @@ public:
             start=start->next;
         }
     }
+};
+
+
+class bst              //binary search tree
+{
+private:
+    int l1, l2;
+    bst* left, *right;
+
+public:
+    bst(int l1_in=0, int l2_in=0)
+    {
+        l1=l1_in;
+        l2=l2_in;
+        right=NULL;
+        left=NULL;
+    }
+
+    void set_value(bst*& start, int l1_in, int l2_in)
+    {
+        start=new bst(l1_in, l2_in);
+    }
+
+    void add_right(bst*& start1, bst*& start2)
+    {
+        start1->right=start2;
+    }
+
+    void add_left(bst*& start1, bst*& start2)
+    {
+        start1->left=start2;
+    }
+
+    void show(bst*& start)
+    {
+        if(start==NULL)
+        {
+            return;
+        }
+        else
+        {
+            if(start->right==NULL  &&  start->left==NULL)
+            {
+                cout<<" ["<<start->l1<<","<<start->l2<<"] ";
+                return;
+            }
+            else
+            {
+                cout<<"(( ";
+                start->left->show(start->left);
+                start->right->show(start->right);
+                cout<<") ";
+                cout<<" ["<<start->l1<<","<<start->l2<<"] )";
+                return;
+            }
+        }
+    }
+
 };
 
 class element
@@ -159,12 +235,17 @@ public:
 
     void set_element(element*& start1, element*& start2, element*& start3)
     {
-        d* tmp_d=tmp_d->mul(start2->matrix, start3->matrix);
+        d* tmp_d=new d;
+        tmp_d=tmp_d->mul(start2->matrix, start3->matrix);
+
         int tmp_l1=start2->matrix->get_l1(start2->matrix);
-        int tmp_l2=start2->matrix->get_l2(start2->matrix);
+        int tmp_l2=start2->matrix->get_l1(start2->matrix);
         int tmp_l3=start3->matrix->get_l2(start3->matrix);
         int tmp_value=tmp_l1*tmp_l2*tmp_l3;
-        linked_list* tmp_path=;
+        tmp_value+=(start2->value  +  start3->value);
+
+        linked_list* tmp_path=new linked_list;
+        tmp_path->concat_2_lists(tmp_path, start2->path, start2->path);
     }
 
     void add_path(element*& start, d* node_in)
@@ -172,6 +253,18 @@ public:
         start->path->make_list(start->path, node_in);  // باید یک ساختتار درختی باشد. این اشتباه است.
     }
 
+    element* get_relation(element**& start, int count,
+                     int*& arr, int i, int j, int k)
+    {
+        int tmp_int=-1;
+        tmp_int=start[(i*count)+k]->value;
+        tmp_int+=start[(k*count)+j]->value;
+        tmp_int+=(arr[i-1]*arr[k]*arr[j]);
+
+        element* output=new element;
+        output->set_element(output, start[(i*count)+k], start[(k*count)+j]);
+        return output;
+    }
 };
 
 void set_mat(int*& arr, int l1, int l2)
