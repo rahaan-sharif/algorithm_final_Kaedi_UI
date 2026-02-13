@@ -1,13 +1,5 @@
-i have to replace k with k+1.
-I have to change mcm function.
-
-
-
-
-
-
-
-
+//i have to replace k with k+1.
+//I have to change mcm function.
 
 
 
@@ -160,15 +152,17 @@ class element
 private:
     d* matrix;
     bst* bst_path;
-    //linked_list* path;
-    //int value;           number of multiplications till here.
 
 public:
     element()
     {
         bst_path=NULL;
-        value=0;
         matrix=NULL;
+    }
+
+    void set(d*& mat_in)
+    {
+        matrix=mat_in;
     }
 
     void set_element(element*& start1, element*& start2, element*& start3)
@@ -193,9 +187,6 @@ public:
 
         start1->matrix=tmp_d;
         start1->bst_path=tmp_path;
-
-        //linked_list* tmp_path=new linked_list;
-        //tmp_path->concat_2_lists(tmp_path, start2->path, start2->path);
     }
 
     int get_value(element*& start)
@@ -206,20 +197,31 @@ public:
     void get_relation(element**& start, int count,
                       int i, int j, int k)
     {
+        int index[3]={0};
+        index[0]=(i*count)+k;
+        index[1]=((k+1)*count)+j;
+        index[2]=(i*count)+j;
+
         int tmp_int=-1;
-        tmp_int=start[(i*count)+k]->get_value(start[(i*count)+k]);
-        tmp_int+=start[(k*count)+j]->get_value(start[(k*count)+j]);
-        int tmp_int1=start[(i*count)+k]->matrix->get_l1(start[(i*count)+k]->matrix) ;
-        int tmp_int2=start[(i*count)+k]->matrix->get_l2(start[(i*count)+k]->matrix) ;
-        int tmp_int3=start[(k*count)+j]->matrix->get_l2(start[(k*count)+j]->matrix) ;
+        tmp_int=start[index[0]]->get_value(start[index[1]]);
+        tmp_int+=start[index[1]]->get_value(start[index[1]]);
+        int tmp_int1=start[index[0]]->matrix->get_l1(start[index[0]]->matrix) ;
+        int tmp_int2=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
+        int tmp_int3=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
         tmp_int+=(tmp_int1*tmp_int2*tmp_int3);
 
-        if(start[(i*count)+j]->get_value(start[(i*count)+j]) > tmp_int)
+        if(start[index[3]]->get_value(start[index[2]]) > tmp_int)
         {
-            start[(i*count)+j]->set_element(start[(i*count)+j],
-                                            start[(i*count)+k],
-                                            start[(k*count)+j]);
+            start[index[2]]->set_element(start[index[2]],
+                                            start[index[0]],
+                                            start[index[1]]);
         }
+
+    }
+
+    void show_path(element*& start)
+    {
+        start->bst_path->show(start->bst_path);
     }
 };
 
@@ -235,7 +237,7 @@ void set_mat(int*& arr, int l1, int l2)
     }
 }
 
-void mcm(int**& arr, int* l, int count)      //matrix chain multiplication
+element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
 {
     d** matrices=new d*[count];
     for(int i=0; i<count; i++)
@@ -248,23 +250,28 @@ void mcm(int**& arr, int* l, int count)      //matrix chain multiplication
     {
         table[i]=new element;
     }
-
     for(int i=0; i<count; i++)
     {
-        for(int j=0; j<count; j++)
-        {
-            if((j+i)<count)
-            {
-                int tmp1=j, tmp2=j+i;
-                //cout<<"("<<j<<","<<j+i<<") -> ";
-
-            }
-        }
-
-        cout<<endl;
+        int tmp_int=(i*count)+i;
+        table[tmp_int]->set(matrices[i]);
     }
 
 
+    for(int diagonal=0; diagonal<count; diagonal++)
+    {
+        for(int i=0; i+diagonal<count; i++)
+        {
+            //cout<<"("<< i<<", "<< i+diagonal<<") -> ";
+            int j=i+diagonal;
+            for(int k=i; k<j; k++)
+            {
+                table[0]->get_relation(table, count, i, j, k);
+            }
+        }
+        //cout<<endl<<endl;
+    }
+
+    return table[(0*count) + count-1];
 
 }
 
@@ -285,7 +292,8 @@ int main(void)
         set_mat(arr[i], l[i], l[i+1]);
     }
 
-    mcm(arr, l, mat_count);
+    element* output=mcm(arr, l, mat_count);
+    output->show_path(output);
 
 
     return 0;
