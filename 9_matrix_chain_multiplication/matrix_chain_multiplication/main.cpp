@@ -1,8 +1,3 @@
-//i have to replace k with k+1.
-//I have to change mcm function.
-
-
-
 #include <iostream>
 using namespace std;
 #define mat_count 6
@@ -61,6 +56,15 @@ public:
     void show(d* start)
     {
         cout<<"show d:"<<endl;
+        if(start==NULL)
+        {
+            cout<<"\t NULL pointer"<<endl;
+            return;
+        }
+
+        cout<<"\tl1: "<<start->l1<<endl;
+        cout<<"\tl2: "<<start->l2<<endl;
+
         for(int i=0; i<start->l1; i++)
         {
             for(int j=0; j<start->l2; j++)
@@ -90,26 +94,6 @@ private:
     int l1, l2;
     bst* left, *right;
 
-public:
-    bst(int mul_in, int l1_in=0, int l2_in=0)
-    {
-        l1=l1_in;
-        l2=l2_in;
-        multiplications=mul_in;
-        right=NULL;
-        left=NULL;
-    }
-
-    void set_value(bst*& start, int mul_in, int l1_in, int l2_in)
-    {
-        start=new bst(mul_in, l1_in, l2_in);
-    }
-
-    int get_value(bst*& start)
-    {
-        return start->multiplications;
-    }
-
     void add_right(bst*& start1, bst*& start2)
     {
         start1->right=start2;
@@ -120,10 +104,48 @@ public:
         start1->left=start2;
     }
 
-    void show(bst*& start)
+
+public:
+    bst(int mul_in, int l1_in=0, int l2_in=0)
+    {
+        l1=l1_in;
+        l2=l2_in;
+        multiplications=mul_in;
+        right=NULL;
+        left=NULL;
+    }
+
+    int get_value(bst*& start)
     {
         if(start==NULL)
         {
+            return 0;
+        }
+        else
+        {
+            return start->multiplications;
+        }
+    }
+
+    void set(bst*& start1, bst*& start2, bst*& start3)
+    {
+        start1->l1=start2->l1;
+        start1->l2=start3->l2;
+
+        start1->add_left(start1, start2);
+        start1->add_right(start1, start3);
+
+        start1->multiplications  = start2->multiplications;
+        start1->multiplications += start3->multiplications;
+        start1->multiplications += (start2->l1 * start2->l2 * start3->l2);
+    }
+
+    void show(bst*& start)
+    {
+        cout<<"show bst:\n";
+        if(start==NULL)
+        {
+            cout<<"\t NULL pointer.\n";
             return;
         }
         else
@@ -170,20 +192,9 @@ public:
         d* tmp_d=new d;
         tmp_d=tmp_d->mul(start2->matrix, start3->matrix);
 
-        int tmp_l1=start2->matrix->get_l1(start2->matrix);
-        int tmp_l2=start2->matrix->get_l1(start2->matrix);
-        int tmp_l3=start3->matrix->get_l2(start3->matrix);
-        int tmp_value=tmp_l1*tmp_l2*tmp_l3;
-        tmp_value+=start2->get_value(start2);
-        tmp_value+=start3->get_value(start3);
-
         bst* tmp_path=new bst(0, 0, 0);
-        tmp_path->set_value(tmp_path, tmp_value,
-                            start2->matrix->get_l1(start2->matrix),
-                            start3->matrix->get_l2(start3->matrix));
 
-        tmp_path->add_left(tmp_path, start2->bst_path);
-        tmp_path->add_right(tmp_path, start3->bst_path);
+        tmp_path->set(tmp_path, start2->bst_path, start3->bst_path);
 
         start1->matrix=tmp_d;
         start1->bst_path=tmp_path;
@@ -197,20 +208,42 @@ public:
     void get_relation(element**& start, int count,
                       int i, int j, int k)
     {
+        //cout<<"get_relation function:\n";
+
         int index[3]={0};
         index[0]=(i*count)+k;
         index[1]=((k+1)*count)+j;
         index[2]=(i*count)+j;
 
-        int tmp_int=-1;
-        tmp_int=start[index[0]]->get_value(start[index[1]]);
-        tmp_int+=start[index[1]]->get_value(start[index[1]]);
-        int tmp_int1=start[index[0]]->matrix->get_l1(start[index[0]]->matrix) ;
-        int tmp_int2=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
-        int tmp_int3=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
-        tmp_int+=(tmp_int1*tmp_int2*tmp_int3);
+        /*cout<<"index[0]: "<<index[0]<<endl;
+        cout<<"index[1]: "<<index[1]<<endl;
+        cout<<"index[2]: "<<index[2]<<endl;*/
 
-        if(start[index[3]]->get_value(start[index[2]]) > tmp_int)
+        int tmp_int=-1;
+        //cout<<"tmp_int: "<<tmp_int<<endl;
+        tmp_int=start[index[0]]->get_value(start[index[0]]);
+        //cout<<"tmp_int: "<<tmp_int<<endl;
+        tmp_int+=start[index[1]]->get_value(start[index[1]]);
+        //cout<<"tmp_int: "<<tmp_int<<endl;
+
+        int tmp_int1=start[index[0]]->matrix->get_l1(start[index[0]]->matrix) ;
+        //cout<<"tmp_int1: "<<tmp_int1<<endl;
+
+        int tmp_int2=start[index[0]]->matrix->get_l2(start[index[0]]->matrix) ;
+        //cout<<"tmp_int2: "<<tmp_int2<<endl;
+
+        int tmp_int3=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
+        //cout<<"tmp_int3: "<<tmp_int3<<endl;
+
+        tmp_int+=(tmp_int1*tmp_int2*tmp_int3);
+        //cout<<"tmp_int: "<<tmp_int<<endl;
+
+
+        // اینجا کمتر بودن باید درست بشه. ایراد داره
+
+        cout<<"\tstart[2]->value: "<<start[index[2]]->get_value(start[index[2]])<<endl;
+        cout<<"\ttmp_int: "<<tmp_int<<endl;
+        if(start[index[2]]->get_value(start[index[2]]) > tmp_int)
         {
             start[index[2]]->set_element(start[index[2]],
                                             start[index[0]],
@@ -221,6 +254,13 @@ public:
 
     void show_path(element*& start)
     {
+        start->bst_path->show(start->bst_path);
+    }
+
+    void show_element(element* start)
+    {
+        cout<<"\n\n---------\n";
+        start->matrix->show(start->matrix);
         start->bst_path->show(start->bst_path);
     }
 };
@@ -239,34 +279,63 @@ void set_mat(int*& arr, int l1, int l2)
 
 element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
 {
+    cout<<"mcm funciton\n"<<endl;
+
     d** matrices=new d*[count];
     for(int i=0; i<count; i++)
     {
         matrices[i]=new d(l[i], l[i+1], arr[i]);
     }
 
+    /*for(int i=0; i<count; i++)
+    {
+        matrices[i]->show(matrices[i]);
+    }*/
+    cout<<"matrices are created successfully.\n"<<endl;
+
     element** table=new element*[count*count];
     for(int i=0; i<count*count; i++)
     {
         table[i]=new element;
     }
+
+    /*for(int i=0; i<count*count; i++)
+    {
+        table[i]->show_element(table[i]);
+    }*/
+    cout<<"tabel is created successfully.\n"<<endl;
+
     for(int i=0; i<count; i++)
     {
         int tmp_int=(i*count)+i;
         table[tmp_int]->set(matrices[i]);
     }
 
+    /*for(int i=0; i<count; i++)
+    {
+        cout<<"\n\n**************************************\n";
+        cout<<"i: "<<i<<endl;
+        table[(i*count)+i]->show_element(table[(i*count)+i]);
+    }*/
+    cout<<"first main diagonal is set successfully.\n"<<endl;
 
+
+    cout<<"main part:\n";
     for(int diagonal=0; diagonal<count; diagonal++)
     {
+        cout<<"diagonal: "<<diagonal<<endl;
         for(int i=0; i+diagonal<count; i++)
         {
-            //cout<<"("<< i<<", "<< i+diagonal<<") -> ";
             int j=i+diagonal;
+            cout<<"\ti: "<<i<<endl;
+            cout<<"\tj: "<<j<<endl;
+            //cout<<"\t\t\t("<< i<<", "<< i+diagonal<<") -> "<<endl;
             for(int k=i; k<j; k++)
             {
+                cout<<"\tk: "<<k<<endl;
                 table[0]->get_relation(table, count, i, j, k);
             }
+            cout<<endl;
         }
         //cout<<endl<<endl;
     }
@@ -291,6 +360,8 @@ int main(void)
     {
         set_mat(arr[i], l[i], l[i+1]);
     }
+
+    cout<<"before mcm"<<endl;
 
     element* output=mcm(arr, l, mat_count);
     output->show_path(output);
