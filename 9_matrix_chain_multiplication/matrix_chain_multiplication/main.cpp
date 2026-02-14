@@ -1,6 +1,8 @@
 #include <iostream>
+#include <limits>
 using namespace std;
 #define mat_count 6
+#define max_int  numeric_limits<int>::max()
 
 class d
 {
@@ -94,19 +96,8 @@ private:
     int l1, l2;
     bst* left, *right;
 
-    void add_right(bst*& start1, bst*& start2)
-    {
-        start1->right=start2;
-    }
-
-    void add_left(bst*& start1, bst*& start2)
-    {
-        start1->left=start2;
-    }
-
-
 public:
-    bst(int mul_in, int l1_in=0, int l2_in=0)
+    bst(int mul_in=max_int, int l1_in=0, int l2_in=0)
     {
         l1=l1_in;
         l2=l2_in;
@@ -115,11 +106,11 @@ public:
         left=NULL;
     }
 
-    int get_value(bst*& start)
+    int get_multiplications(bst*& start)
     {
         if(start==NULL)
         {
-            return 0;
+            return max_int;
         }
         else
         {
@@ -127,17 +118,41 @@ public:
         }
     }
 
-    void set(bst*& start1, bst*& start2, bst*& start3)
+    void set(bst*& start1, bst*& start2, bst*& start3, int l1, int l2, int l3)
     {
-        start1->l1=start2->l1;
-        start1->l2=start3->l2;
+        if(start2!=NULL)
+        {
+            start1->l1=start2->l1;
+        }
+        else
+        {
+            start1->l1=l1;
+        }
 
-        start1->add_left(start1, start2);
-        start1->add_right(start1, start3);
+        if(start3!=NULL)
+        {
+            start1->l2=start3->l2;
+        }
+        else
+        {
+            start1->l2=l3;
+        }
 
-        start1->multiplications  = start2->multiplications;
-        start1->multiplications += start3->multiplications;
-        start1->multiplications += (start2->l1 * start2->l2 * start3->l2);
+        start1->left=start2;
+        start1->right=start3;
+
+        //اینجا باید با تابع مقادیر ضرب را دریافت کنم و برای نال شدن چاره یابم.
+        start1->multiplications=0;
+        if(start2!=NULL && start2->multiplications!=max_int)
+        {
+            start1->multiplications  = start2->multiplications;
+        }
+        if(start3!=NULL && start3->multiplications!=max_int)
+        {
+            start1->multiplications += start3->multiplications;
+        }
+
+        start1->multiplications += (l1 * l2 * l3);
     }
 
     void show(bst*& start)
@@ -192,17 +207,19 @@ public:
         d* tmp_d=new d;
         tmp_d=tmp_d->mul(start2->matrix, start3->matrix);
 
-        bst* tmp_path=new bst(0, 0, 0);
-
-        tmp_path->set(tmp_path, start2->bst_path, start3->bst_path);
+        bst* tmp_path=new bst;
+        int l1=start2->matrix->get_l1(start2->matrix) ;
+        int l2=start2->matrix->get_l2(start2->matrix) ;
+        int l3=start3->matrix->get_l2(start3->matrix);
+        tmp_path->set(tmp_path, start2->bst_path, start3->bst_path,l1, l2, l3);
 
         start1->matrix=tmp_d;
         start1->bst_path=tmp_path;
     }
 
-    int get_value(element*& start)
+    int get_multiplications(element*& start)
     {
-        return start->bst_path->get_value(start->bst_path);
+        return start->bst_path->get_multiplications(start->bst_path);
     }
 
     void get_relation(element**& start, int count,
@@ -215,35 +232,55 @@ public:
         index[1]=((k+1)*count)+j;
         index[2]=(i*count)+j;
 
-        /*cout<<"index[0]: "<<index[0]<<endl;
-        cout<<"index[1]: "<<index[1]<<endl;
-        cout<<"index[2]: "<<index[2]<<endl;*/
+        int tmp_int=0;
 
-        int tmp_int=-1;
-        //cout<<"tmp_int: "<<tmp_int<<endl;
-        tmp_int=start[index[0]]->get_value(start[index[0]]);
-        //cout<<"tmp_int: "<<tmp_int<<endl;
-        tmp_int+=start[index[1]]->get_value(start[index[1]]);
-        //cout<<"tmp_int: "<<tmp_int<<endl;
+        if(start[index[0]]->get_multiplications(start[index[0]])==max_int ||
+           start[index[1]]->get_multiplications(start[index[1]])==max_int)
+        {
+            if(start[index[0]]->matrix!=NULL &&
+               start[index[1]]->matrix!=NULL)
+            {
+                cout<<"\t\ti: "<<i<<"  k: "<<k<<"       k+1: "<<k+1<<"  j: "<<j<<endl;
+                int tmp_int1=-1, tmp_int2=-1;
+                tmp_int1=start[index[0]]->get_multiplications(start[index[0]]);
+                tmp_int2=start[index[1]]->get_multiplications(start[index[1]]);
 
-        int tmp_int1=start[index[0]]->matrix->get_l1(start[index[0]]->matrix) ;
-        //cout<<"tmp_int1: "<<tmp_int1<<endl;
+                if(tmp_int1==max_int)
+                {
+                    tmp_int1=0;
+                }
+                if(tmp_int2==max_int)
+                {
+                    tmp_int2=0;
+                }
 
-        int tmp_int2=start[index[0]]->matrix->get_l2(start[index[0]]->matrix) ;
-        //cout<<"tmp_int2: "<<tmp_int2<<endl;
+                int tmp_int11=start[index[0]]->matrix->get_l1(start[index[0]]->matrix) ;
+                int tmp_int22=start[index[0]]->matrix->get_l2(start[index[0]]->matrix) ;
+                int tmp_int33=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
 
-        int tmp_int3=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
-        //cout<<"tmp_int3: "<<tmp_int3<<endl;
+                tmp_int=(tmp_int11*tmp_int22*tmp_int33);
+                tmp_int+=tmp_int1+tmp_int2;
+            }
+            else
+            {
+                cout<<"\t\t *** i: "<<i<<"  j: "<<j<<"  k: "<<k<<endl;
+                tmp_int=max_int;
+            }
+        }
+        else
+        {
+            tmp_int=-1;
+            tmp_int=start[index[0]]->get_multiplications(start[index[0]]);
+            tmp_int+=start[index[1]]->get_multiplications(start[index[1]]);
 
-        tmp_int+=(tmp_int1*tmp_int2*tmp_int3);
-        //cout<<"tmp_int: "<<tmp_int<<endl;
+            int tmp_int1=start[index[0]]->matrix->get_l1(start[index[0]]->matrix) ;
+            int tmp_int2=start[index[0]]->matrix->get_l2(start[index[0]]->matrix) ;
+            int tmp_int3=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
 
+            tmp_int+=(tmp_int1*tmp_int2*tmp_int3);
+        }
 
-        // اینجا کمتر بودن باید درست بشه. ایراد داره
-
-        cout<<"\tstart[2]->value: "<<start[index[2]]->get_value(start[index[2]])<<endl;
-        cout<<"\ttmp_int: "<<tmp_int<<endl;
-        if(start[index[2]]->get_value(start[index[2]]) > tmp_int)
+        if(start[index[2]]->get_multiplications(start[index[2]]) >= tmp_int)
         {
             start[index[2]]->set_element(start[index[2]],
                                             start[index[0]],
@@ -339,6 +376,9 @@ element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
         }
         //cout<<endl<<endl;
     }
+
+    table[3]->show_element(table[(0*count)+count-1]);
+    cout<<"\n-----------------------------------------------------"<<endl;
 
     return table[(0*count) + count-1];
 
