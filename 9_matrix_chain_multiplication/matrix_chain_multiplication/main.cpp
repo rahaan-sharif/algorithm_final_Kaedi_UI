@@ -4,6 +4,7 @@ using namespace std;
 #define mat_count 6
 #define max_int  numeric_limits<int>::max()
 
+//checked.
 class d
 {
 private:
@@ -12,6 +13,7 @@ private:
     int* array;
 
 public:
+    //checked.
     d(int l1_in=-1, int l2_in=-1, int* array_in=NULL)
     {
         l1=l1_in;
@@ -19,6 +21,7 @@ public:
         array=array_in;
     }
 
+    //checked.
     d* mul(d*& mat1, d*& mat2)
     {
         if(mat1->l2!=mat2->l1)
@@ -55,6 +58,7 @@ public:
         }
     }
 
+    //checked.
     void show(d* start)
     {
         cout<<"show d:"<<endl;
@@ -78,17 +82,20 @@ public:
         cout<<endl<<endl;
     }
 
+    //checked.
     int get_l1(d* start)
     {
         return start->l1;
     }
 
+    //checked.
     int get_l2(d* start)
     {
         return start->l2;
     }
 };
 
+//checked.
 class bst              //binary search tree
 {
 private:
@@ -97,11 +104,11 @@ private:
     bst* left, *right;
 
 public:
-    bst(int mul_in=max_int, int l1_in=0, int l2_in=0)
+    bst(int l1_in, int l2_in)
     {
         l1=l1_in;
         l2=l2_in;
-        multiplications=mul_in;
+        multiplications=max_int;
         right=NULL;
         left=NULL;
     }
@@ -118,49 +125,34 @@ public:
         }
     }
 
-    void set(bst*& start1, bst*& start2, bst*& start3, int l1, int l2, int l3)
+    void set(bst*& start1, bst*& start2, bst*& start3)
     {
-        if(start2!=NULL)
-        {
-            start1->l1=start2->l1;
-        }
-        else
-        {
-            start1->l1=l1;
-        }
-
-        if(start3!=NULL)
-        {
-            start1->l2=start3->l2;
-        }
-        else
-        {
-            start1->l2=l3;
-        }
+        start1=new bst(-1, -1);
 
         start1->left=start2;
         start1->right=start3;
 
-        //اینجا باید با تابع مقادیر ضرب را دریافت کنم و برای نال شدن چاره یابم.
-        start1->multiplications=0;
-        if(start2!=NULL && start2->multiplications!=max_int)
-        {
-            start1->multiplications  = start2->multiplications;
-        }
-        if(start3!=NULL && start3->multiplications!=max_int)
-        {
-            start1->multiplications += start3->multiplications;
-        }
+        start1->l1=start2->l1;
+        start1->l2=start3->l2;
 
-        start1->multiplications += (l1 * l2 * l3);
+        int tmp_int=0;
+        if(start2->multiplications!=max_int)
+        {
+            tmp_int+=start2->multiplications;
+        }
+        if(start3->multiplications!=max_int)
+        {
+            tmp_int+=start3->multiplications;
+        }
+        tmp_int+=start2->l1 * start2->l2 * start3->l2;
+        start1->multiplications=tmp_int;
+
     }
 
     void show(bst*& start)
     {
-        cout<<"\n\nshow bst:\n";
         if(start==NULL)
         {
-            //cout<<"\t NULL pointer.\n";
             return;
         }
         else
@@ -172,17 +164,19 @@ public:
             }
             else
             {
-                cout<<"(( ";
+                cout<<"( ";
                 start->left->show(start->left);
                 start->right->show(start->right);
                 cout<<") ";
-                cout<<" ["<<start->l1<<","<<start->l2<<"] )\n";
+
                 return;
             }
         }
     }
 
 };
+
+
 
 class element
 {
@@ -193,13 +187,18 @@ private:
 public:
     element()
     {
-        bst_path=NULL;
-        matrix=NULL;
+        bst_path=new bst(-1, -1);
+        matrix  =new d(-1, 1);
     }
 
-    void set(d*& mat_in)
+    void set_matrix(element*& start, d*& mat_in)
     {
-        matrix=mat_in;
+        start->matrix=mat_in;
+    }
+
+    void set_path(element*& start, bst*& path_in)
+    {
+        start->bst_path=path_in;
     }
 
     void set_element(element*& start1, element*& start2, element*& start3)
@@ -207,11 +206,8 @@ public:
         d* tmp_d=new d;
         tmp_d=tmp_d->mul(start2->matrix, start3->matrix);
 
-        bst* tmp_path=new bst;
-        int l1=start2->matrix->get_l1(start2->matrix) ;
-        int l2=start2->matrix->get_l2(start2->matrix) ;
-        int l3=start3->matrix->get_l2(start3->matrix) ;
-        tmp_path->set(tmp_path, start2->bst_path, start3->bst_path, l1, l2, l3);
+        bst* tmp_path=new bst(-1, -1);
+        tmp_path->set(tmp_path, start2->bst_path, start3->bst_path);
 
         start1->matrix=tmp_d;
         start1->bst_path=tmp_path;
@@ -324,18 +320,41 @@ public:
     }
 };
 
-void set_mat(int*& arr, int l1, int l2)
+d** set_matrices()
 {
-    arr=new int[l1*l2];
+    int* l=new int[mat_count+1];
+     l[0]= 5;
+     l[1]= 2;
+     l[2]= 3;
+     l[3]= 4;
+     l[4]= 6;
+     l[5]= 7;
+     l[6]= 8;
 
-    int tmp=(l1*l2)+11;
-    for(int i=0; i<l1*l2; i++)
-    {
-        arr[i]=((((i*17)+((i*37)*43)/(19))<<2)*23*tmp+tmp+7)%10;
-        tmp=(tmp*29)%97;
-    }
+     d** matrices=new d*[mat_count];
+
+     for(int i=0; i<mat_count; i++)
+     {
+         int l1=l[i];
+         int l2=l[i+1];
+         int* arr=NULL;
+
+
+         arr=new int[l1*l2];
+         int tmp=(l1*l2)+11;
+         for(int i=0; i<l1*l2; i++)
+         {
+             arr[i]=((((i*17)+((i*37)*43)/(19))<<2)*23*tmp+tmp+7)%10;
+             tmp=(tmp*29)%97;
+         }
+
+         matrices[i]=new d(l1, l2, arr);
+     }
+
+     return matrices;
 }
 
+/*
 element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
 {
     d** matrices=new d*[count];
@@ -383,28 +402,26 @@ element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
     return table[(0*count) + count-1];
 
 }
+*/
 
 int main(void)
 {
-    int* l=new int[mat_count+1];
-    l[0]= 5;
-    l[1]= 2;
-    l[2]= 3;
-    l[3]= 4;
-    l[4]= 6;
-    l[5]= 7;
-    l[6]= 8;
+    d** matrices=set_matrices();
 
-    int** arr=new int*[mat_count];
-    for(int i=0; i<mat_count; i++)
-    {
-        set_mat(arr[i], l[i], l[i+1]);
-    }
+    //test part:
+    //element class must be tested before anything.
+    element* start1=new element();
+    element* start2=new element();
+    element* start3=new element();
+
+
+
 
     cout<<"before mcm"<<endl;
 
     element* output=mcm(arr, l, mat_count);
     output->show_path(output);
+
 
 
     return 0;
