@@ -188,21 +188,21 @@ public:
     element()
     {
         bst_path=new bst(-1, -1);
-        matrix  =new d(-1, 1);
+        matrix  =new d(-1, -1);
     }
 
-    void set_matrix(element*& start, d*& mat_in)
+    element(d*& mat_in)
     {
-        start->matrix=mat_in;
-    }
-
-    void set_path(element*& start, bst*& path_in)
-    {
-        start->bst_path=path_in;
+        matrix=mat_in;
+        int l1=mat_in->get_l1(mat_in);
+        int l2=mat_in->get_l2(mat_in);
+        bst_path=new bst(l1, l2);
     }
 
     void set_element(element*& start1, element*& start2, element*& start3)
     {
+        start1=new element();
+
         d* tmp_d=new d;
         tmp_d=tmp_d->mul(start2->matrix, start3->matrix);
 
@@ -307,12 +307,7 @@ public:
 
     }
 
-    void show_path(element*& start)
-    {
-        start->bst_path->show(start->bst_path);
-    }
-
-    void show_element(element* start)
+    void show(element* start)
     {
         cout<<"\n\n---------\n";
         start->matrix->show(start->matrix);
@@ -410,17 +405,32 @@ int main(void)
 
     //test part:
     //element class must be tested before anything.
-    element* start1=new element();
-    element* start2=new element();
-    element* start3=new element();
+    element** start=new element*[11];
+
+    start[0]=new element(matrices[0]);
+    start[1]=new element(matrices[1]);
+    start[2]=new element(matrices[2]);
+    start[3]=new element(matrices[3]);
+    start[4]=new element(matrices[4]);
+    start[5]=new element(matrices[5]);
+
+    start[6]->set_element(start[6], start[0], start[1]);
+    start[7]->set_element(start[7], start[2], start[3]);
+    start[8]->set_element(start[8], start[4], start[5]);
+    start[9]->set_element(start[9], start[7], start[8]);
+    start[10]->set_element(start[10], start[6], start[9]);
+
+    start[10]->show(start[10]);
 
 
 
 
-    cout<<"before mcm"<<endl;
+    cout<<"\n\nbefore mcm"<<endl;
 
+    /*
     element* output=mcm(arr, l, mat_count);
     output->show_path(output);
+    */
 
 
 
