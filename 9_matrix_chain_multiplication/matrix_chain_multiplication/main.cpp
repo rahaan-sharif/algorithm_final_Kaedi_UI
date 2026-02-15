@@ -157,10 +157,10 @@ public:
 
     void show(bst*& start)
     {
-        cout<<"show bst:\n";
+        cout<<"\n\nshow bst:\n";
         if(start==NULL)
         {
-            cout<<"\t NULL pointer.\n";
+            //cout<<"\t NULL pointer.\n";
             return;
         }
         else
@@ -176,7 +176,7 @@ public:
                 start->left->show(start->left);
                 start->right->show(start->right);
                 cout<<") ";
-                cout<<" ["<<start->l1<<","<<start->l2<<"] )";
+                cout<<" ["<<start->l1<<","<<start->l2<<"] )\n";
                 return;
             }
         }
@@ -210,8 +210,8 @@ public:
         bst* tmp_path=new bst;
         int l1=start2->matrix->get_l1(start2->matrix) ;
         int l2=start2->matrix->get_l2(start2->matrix) ;
-        int l3=start3->matrix->get_l2(start3->matrix);
-        tmp_path->set(tmp_path, start2->bst_path, start3->bst_path,l1, l2, l3);
+        int l3=start3->matrix->get_l2(start3->matrix) ;
+        tmp_path->set(tmp_path, start2->bst_path, start3->bst_path, l1, l2, l3);
 
         start1->matrix=tmp_d;
         start1->bst_path=tmp_path;
@@ -269,6 +269,28 @@ public:
         }
         else
         {
+            cout<<"\n\t\telse part:\n";
+            cout<<"\t\ti: "<<i<<"  k: "<<k<<"       k+1: "<<k+1<<"  j: "<<j<<endl;
+            if(start[index[0]]->bst_path==NULL)
+            {
+                cout<<"\t\t0 IS null.\n";
+            }
+            else
+            {
+                cout<<"\n-----------\n";
+                start[index[0]]->bst_path->show(start[index[0]]->bst_path);
+                cout<<"\n===========\n";
+            }
+            if(start[index[1]]->bst_path==NULL)
+            {
+                cout<<"\t\t1 is null.\n";
+            }
+            if(start[index[2]]->bst_path==NULL)
+            {
+                cout<<"\t\t2 is null.\n";
+            }
+            cout<<endl;
+
             tmp_int=-1;
             tmp_int=start[index[0]]->get_multiplications(start[index[0]]);
             tmp_int+=start[index[1]]->get_multiplications(start[index[1]]);
@@ -316,19 +338,11 @@ void set_mat(int*& arr, int l1, int l2)
 
 element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
 {
-    cout<<"mcm funciton\n"<<endl;
-
     d** matrices=new d*[count];
     for(int i=0; i<count; i++)
     {
         matrices[i]=new d(l[i], l[i+1], arr[i]);
     }
-
-    /*for(int i=0; i<count; i++)
-    {
-        matrices[i]->show(matrices[i]);
-    }*/
-    cout<<"matrices are created successfully.\n"<<endl;
 
     element** table=new element*[count*count];
     for(int i=0; i<count*count; i++)
@@ -336,25 +350,11 @@ element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
         table[i]=new element;
     }
 
-    /*for(int i=0; i<count*count; i++)
-    {
-        table[i]->show_element(table[i]);
-    }*/
-    cout<<"tabel is created successfully.\n"<<endl;
-
     for(int i=0; i<count; i++)
     {
         int tmp_int=(i*count)+i;
         table[tmp_int]->set(matrices[i]);
     }
-
-    /*for(int i=0; i<count; i++)
-    {
-        cout<<"\n\n**************************************\n";
-        cout<<"i: "<<i<<endl;
-        table[(i*count)+i]->show_element(table[(i*count)+i]);
-    }*/
-    cout<<"first main diagonal is set successfully.\n"<<endl;
 
 
     cout<<"main part:\n";
