@@ -4,7 +4,6 @@ using namespace std;
 #define mat_count 6
 #define max_int  numeric_limits<int>::max()
 
-//checked.
 class d
 {
 private:
@@ -13,7 +12,6 @@ private:
     int* array;
 
 public:
-    //checked.
     d(int l1_in=-1, int l2_in=-1, int* array_in=NULL)
     {
         l1=l1_in;
@@ -21,7 +19,6 @@ public:
         array=array_in;
     }
 
-    //checked.
     d* mul(d*& mat1, d*& mat2)
     {
         if(mat1->l2!=mat2->l1)
@@ -58,10 +55,9 @@ public:
         }
     }
 
-    //checked.
     void show(d* start)
     {
-        cout<<"show d:"<<endl;
+        cout<<"show matrix(class d):"<<endl;
         if(start==NULL)
         {
             cout<<"\t NULL pointer"<<endl;
@@ -70,9 +66,11 @@ public:
 
         cout<<"\tl1: "<<start->l1<<endl;
         cout<<"\tl2: "<<start->l2<<endl;
+        cout<<"\n";
 
         for(int i=0; i<start->l1; i++)
         {
+            cout<<"\t";
             for(int j=0; j<start->l2; j++)
             {
                 cout<<start->array[(i*start->l2)+j]<<"\t";
@@ -82,20 +80,17 @@ public:
         cout<<endl<<endl;
     }
 
-    //checked.
     int get_l1(d* start)
     {
         return start->l1;
     }
 
-    //checked.
     int get_l2(d* start)
     {
         return start->l2;
     }
 };
 
-//checked.
 class bst              //binary search tree
 {
 private:
@@ -176,8 +171,6 @@ public:
 
 };
 
-
-
 class element
 {
 private:
@@ -221,97 +214,46 @@ public:
     void get_relation(element**& start, int count,
                       int i, int j, int k)
     {
-        //cout<<"get_relation function:\n";
-
         int index[3]={0};
         index[0]=(i*count)+k;
         index[1]=((k+1)*count)+j;
         index[2]=(i*count)+j;
 
+        int tmp_multiplications=0;
+
+        if(start[index[0]]->get_multiplications(start[index[0]])!=max_int)
+        {
+            tmp_multiplications+=start[index[0]]->get_multiplications(start[index[0]]);
+        }
+        if(start[index[1]]->get_multiplications(start[index[1]])!=max_int)
+        {
+            tmp_multiplications+=start[index[1]]->get_multiplications(start[index[1]]);
+        }
+
         int tmp_int=0;
+        tmp_int  =start[index[0]]->matrix->get_l1(start[index[0]]->matrix);
+        tmp_int *=start[index[0]]->matrix->get_l2(start[index[0]]->matrix);
+        tmp_int *=start[index[1]]->matrix->get_l2(start[index[1]]->matrix);
 
-        if(start[index[0]]->get_multiplications(start[index[0]])==max_int ||
-           start[index[1]]->get_multiplications(start[index[1]])==max_int)
-        {
-            if(start[index[0]]->matrix!=NULL &&
-               start[index[1]]->matrix!=NULL)
-            {
-                cout<<"\t\ti: "<<i<<"  k: "<<k<<"       k+1: "<<k+1<<"  j: "<<j<<endl;
-                int tmp_int1=-1, tmp_int2=-1;
-                tmp_int1=start[index[0]]->get_multiplications(start[index[0]]);
-                tmp_int2=start[index[1]]->get_multiplications(start[index[1]]);
+        tmp_multiplications+=tmp_int;
 
-                if(tmp_int1==max_int)
-                {
-                    tmp_int1=0;
-                }
-                if(tmp_int2==max_int)
-                {
-                    tmp_int2=0;
-                }
-
-                int tmp_int11=start[index[0]]->matrix->get_l1(start[index[0]]->matrix) ;
-                int tmp_int22=start[index[0]]->matrix->get_l2(start[index[0]]->matrix) ;
-                int tmp_int33=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
-
-                tmp_int=(tmp_int11*tmp_int22*tmp_int33);
-                tmp_int+=tmp_int1+tmp_int2;
-            }
-            else
-            {
-                cout<<"\t\t *** i: "<<i<<"  j: "<<j<<"  k: "<<k<<endl;
-                tmp_int=max_int;
-            }
-        }
-        else
-        {
-            cout<<"\n\t\telse part:\n";
-            cout<<"\t\ti: "<<i<<"  k: "<<k<<"       k+1: "<<k+1<<"  j: "<<j<<endl;
-            if(start[index[0]]->bst_path==NULL)
-            {
-                cout<<"\t\t0 IS null.\n";
-            }
-            else
-            {
-                cout<<"\n-----------\n";
-                start[index[0]]->bst_path->show(start[index[0]]->bst_path);
-                cout<<"\n===========\n";
-            }
-            if(start[index[1]]->bst_path==NULL)
-            {
-                cout<<"\t\t1 is null.\n";
-            }
-            if(start[index[2]]->bst_path==NULL)
-            {
-                cout<<"\t\t2 is null.\n";
-            }
-            cout<<endl;
-
-            tmp_int=-1;
-            tmp_int=start[index[0]]->get_multiplications(start[index[0]]);
-            tmp_int+=start[index[1]]->get_multiplications(start[index[1]]);
-
-            int tmp_int1=start[index[0]]->matrix->get_l1(start[index[0]]->matrix) ;
-            int tmp_int2=start[index[0]]->matrix->get_l2(start[index[0]]->matrix) ;
-            int tmp_int3=start[index[1]]->matrix->get_l2(start[index[1]]->matrix) ;
-
-            tmp_int+=(tmp_int1*tmp_int2*tmp_int3);
-        }
-
-        if(start[index[2]]->get_multiplications(start[index[2]]) >= tmp_int)
+        if(start[index[2]]->get_multiplications(start[index[2]]) >= tmp_multiplications)
         {
             start[index[2]]->set_element(start[index[2]],
-                                            start[index[0]],
-                                            start[index[1]]);
+                                         start[index[0]],
+                                         start[index[1]] );
         }
 
     }
 
     void show(element* start)
     {
-        cout<<"\n\n---------\n";
+        cout<<"\n---------\n";
+        cout<<"total multiplications: "<<start->get_multiplications(start)<<"\n\n";
         start->matrix->show(start->matrix);
+        cout<<"show path:\n\t";
         start->bst_path->show(start->bst_path);
+        cout<<"\n---------\n\n";
     }
 };
 
@@ -346,18 +288,17 @@ d** set_matrices()
          matrices[i]=new d(l1, l2, arr);
      }
 
+     for(int i=0; i<mat_count; i++)
+     {
+         cout<<"marix_"<<i<<": \n";
+         matrices[i]->show(matrices[i]);
+     }
+
      return matrices;
 }
 
-/*
-element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
+element* mcm(d**& matrices, int count)      //matrix chain multiplication
 {
-    d** matrices=new d*[count];
-    for(int i=0; i<count; i++)
-    {
-        matrices[i]=new d(l[i], l[i+1], arr[i]);
-    }
-
     element** table=new element*[count*count];
     for(int i=0; i<count*count; i++)
     {
@@ -367,72 +308,33 @@ element* mcm(int**& arr, int* l, int count)      //matrix chain multiplication
     for(int i=0; i<count; i++)
     {
         int tmp_int=(i*count)+i;
-        table[tmp_int]->set(matrices[i]);
+        table[tmp_int]=new element(matrices[i]);
     }
 
-
-    cout<<"main part:\n";
     for(int diagonal=0; diagonal<count; diagonal++)
     {
-        cout<<"diagonal: "<<diagonal<<endl;
         for(int i=0; i+diagonal<count; i++)
         {
             int j=i+diagonal;
-            cout<<"\ti: "<<i<<endl;
-            cout<<"\tj: "<<j<<endl;
-            //cout<<"\t\t\t("<< i<<", "<< i+diagonal<<") -> "<<endl;
             for(int k=i; k<j; k++)
             {
-                cout<<"\tk: "<<k<<endl;
                 table[0]->get_relation(table, count, i, j, k);
             }
-            cout<<endl;
         }
-        //cout<<endl<<endl;
     }
 
-    table[3]->show_element(table[(0*count)+count-1]);
-    cout<<"\n-----------------------------------------------------"<<endl;
-
     return table[(0*count) + count-1];
-
 }
-*/
 
 int main(void)
 {
     d** matrices=set_matrices();
+    element* output=mcm(matrices, mat_count);
 
-    //test part:
-    //element class must be tested before anything.
-    element** start=new element*[11];
-
-    start[0]=new element(matrices[0]);
-    start[1]=new element(matrices[1]);
-    start[2]=new element(matrices[2]);
-    start[3]=new element(matrices[3]);
-    start[4]=new element(matrices[4]);
-    start[5]=new element(matrices[5]);
-
-    start[6]->set_element(start[6], start[0], start[1]);
-    start[7]->set_element(start[7], start[2], start[3]);
-    start[8]->set_element(start[8], start[4], start[5]);
-    start[9]->set_element(start[9], start[7], start[8]);
-    start[10]->set_element(start[10], start[6], start[9]);
-
-    start[10]->show(start[10]);
-
-
-
-
-    cout<<"\n\nbefore mcm"<<endl;
-
-    /*
-    element* output=mcm(arr, l, mat_count);
-    output->show_path(output);
-    */
-
-
+    cout<<"\n\n\nmultiplication result:\n";
+    output->show(output);
 
     return 0;
 }
+
+
