@@ -2,7 +2,7 @@
 #include <limits>
 using namespace std;
 #define mat_count 5
-#define max_int  numeric_limits<int>::max()
+#define max_float  numeric_limits<float>::max()
 
 
 //checked.
@@ -53,58 +53,139 @@ public:
     }
 };
 
+class linked_list
+{
+private:
+    float value;
+    linked_list* next;
 
-/*
+public:
+    linked_list(float value_in=0)
+    {
+        value=value_in;
+        next=NULL;
+    }
+
+    void make_list(linked_list*& start, float value_in)
+    {
+        if(start==NULL)
+        {
+            start=new linked_list(value_in);
+            return;
+        }
+        else
+        {
+            linked_list* tmp_ll=start;
+            while(tmp_ll->next!=NULL)
+            {
+                tmp_ll=tmp_ll->next;
+            }
+            tmp_ll->next=new linked_list(value_in);
+            return;
+        }
+    }
+
+    void show(linked_list* start)
+    {
+        while(start!=NULL)
+        {
+            cout<<start->value<<"\t";
+        }
+        return;
+    }
+
+    float get_sum(linked_list* start)
+    {
+        float sum=0;
+        int i=1;
+        while(start!=NULL)
+        {
+            sum += i * start->value;
+            start=start->next;
+        }
+        return sum;
+    }
+
+    void concat(linked_list*& start1, linked_list*& start2, linked_list*& start3)
+    {
+        if(start2==NULL)
+        {
+            start1=start3;
+            return;
+        }
+        else
+        {
+            start1=start2;
+            linked_list* tmp_ll=start1;
+            while(tmp_ll->next!=NULL)
+            {
+                tmp_ll=tmp_ll->next;
+            }
+            tmp_ll->next=start3;
+            return;
+        }
+    }
+};
+
 class bst              //binary search tree
 {
 private:
-    int multiplications;   //number of multiplications till here.
-    int l1, l2;
+    data* dp; //data pointe
     bst* left, *right;
 
-public:
-    bst(int l1_in, int l2_in)
+    float sum_probabilities(bst*& start, int i)
     {
-        l1=l1_in;
-        l2=l2_in;
-        multiplications=max_int;
+        if(start==NULL)
+        {
+            cout<<"null\n";
+            return 0;
+        }
+        else
+        {
+            float sum = 0;
+            i++;
+            sum += i*start->dp->get_probability(start->dp);
+            i++;
+            sum += start->right->sum_probabilities(start->right, i);
+            cout<<"\t\tsum: "<<sum<<endl;
+            sum += start->left->sum_probabilities(start->left, i);
+            cout<<"\t\tsum: "<<sum<<endl;
+            cout<<"\t\t***\n";
+
+            return sum;
+        }
+    }
+
+public:
+    bst(data* dpi=NULL ) //dpi=data pointer in
+    {
+        dp=dpi;
         right=NULL;
         left=NULL;
     }
 
-    int get_multiplications(bst*& start)
+    void set(bst*& start1, bst* start2, bst* start3, data*& dpi /*data pointer in*/)
     {
-        if(start==NULL)
-        {
-            return max_int;
-        }
-        else
-        {
-            return start->multiplications;
-        }
-    }
-
-    void set(bst*& start1, bst*& start2, bst*& start3)
-    {
-        start1=new bst(-1, -1);
+        cout<<"\n\nset_func()\n";
+        start1=new bst(dpi);
+        cout<<start1->dp->get_key(start1->dp)<<endl;
 
         start1->left=start2;
         start1->right=start3;
 
-        start1->l1=start2->l1;
-        start1->l2=start3->l2;
+        float tmp_float=0;
+        tmp_float+=start1->left->sum_probabilities(start1->left, 1);
+        tmp_float+=start1->right->sum_probabilities(start1->right, 1);
 
-        int tmp_int=0;
-        if(start2->multiplications!=max_int)
-        {
-            tmp_int+=start2->multiplications;
-        }
-        if(start3->multiplications!=max_int)
-        {
-            tmp_int+=start3->multiplications;
-        }
-        tmp_int+=start2->l1 * start2->l2 * start3->l2;
-        start1->multiplications=tmp_int;
+        tmp_float += start1->dp->get_probability(start1->dp);
+        cout<<"\tsearch_count: "<<tmp_float<<endl;
+
+
+        cout<<"-------------\n";
+        cout<<endl<<endl<<endl;
+        cout<<endl<<endl<<endl;
+        cout<<endl<<endl<<endl;
+        cout<<endl<<endl<<endl;
 
     }
 
@@ -116,25 +197,27 @@ public:
         }
         else
         {
-            if(start->right==NULL  &&  start->left==NULL)
+            cout<<"( ";
+            if(start->left!=NULL)
             {
-                cout<<" ["<<start->l1<<","<<start->l2<<"] ";
-                return;
-            }
-            else
-            {
-                cout<<"( ";
                 start->left->show(start->left);
-                start->right->show(start->right);
-                cout<<") ";
-
-                return;
             }
+            cout<<"[k= ";
+            cout<<start->dp->get_key(start->dp)<<" ";
+            cout<<", sc= "<<start->sum_probabilities(start, 0)<<"] ";
+            if(start->right!=NULL)
+            {
+                start->right->show(start->right);
+            }
+            cout<<" ) ";
+
         }
     }
 
 };
 
+
+/*
 class element
 {
 private:
@@ -306,8 +389,28 @@ int main(void)
 
 int main(void)
 {
-    data* start=new data(10, 0.2, 2);
-    start->show(start);
+
+    data** d_start=new data*[4];
+    d_start[0]=new data(0, 3.0/8);
+    d_start[1]=new data(1, 3.0/8);
+    d_start[2]=new data(2, 1.0/8);
+    d_start[3]=new data(3, 1.0/8);
+
+    bst** start=new bst*[5];
+
+    cout<<"before bst.\n";
+    start[3]->set(start[3], NULL, NULL, d_start[3]);
+    cout<<"*************\n";
+    start[3]->show(start[3]);
+    cout<<"*************\n\n\n";
+    start[2]->set(start[2], NULL, start[3], d_start[2]);
+    start[1]->set(start[1], NULL, NULL, d_start[1]);
+    start[0]->set(start[0], start[1], start[2], d_start[0]);
+
+    start[0]->show(start[0]);
+
+
+
 
 
     return 0;
