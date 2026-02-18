@@ -1,7 +1,7 @@
 #include <iostream>
 #include <limits>
 using namespace std;
-#define mat_count 5
+#define nodes_count 5
 #define max_float  numeric_limits<float>::max()
 
 
@@ -133,134 +133,9 @@ public:
 };
 
 
-/*
-class element
-{
-private:
-    d* matrix;
-    bst* bst_path;
 
-public:
-    element()
-    {
-        bst_path=new bst(-1, -1);
-        matrix  =new d(-1, -1);
-    }
-
-    element(d*& mat_in)
-    {
-        matrix=mat_in;
-        int l1=mat_in->get_l1(mat_in);
-        int l2=mat_in->get_l2(mat_in);
-        bst_path=new bst(l1, l2);
-    }
-
-    void set_element(element*& start1, element*& start2, element*& start3)
-    {
-        start1=new element();
-
-        d* tmp_d=new d;
-        tmp_d=tmp_d->mul(start2->matrix, start3->matrix);
-
-        bst* tmp_path=new bst(-1, -1);
-        tmp_path->set(tmp_path, start2->bst_path, start3->bst_path);
-
-        start1->matrix=tmp_d;
-        start1->bst_path=tmp_path;
-    }
-
-    int get_multiplications(element*& start)
-    {
-        return start->bst_path->get_multiplications(start->bst_path);
-    }
-
-    void get_relation(element**& start, int count,
-                      int i, int j, int k)
-    {
-        int index[3]={0};
-        index[0]=(i*count)+k;
-        index[1]=((k+1)*count)+j;
-        index[2]=(i*count)+j;
-
-        int tmp_multiplications=0;
-
-        if(start[index[0]]->get_multiplications(start[index[0]])!=max_int)
-        {
-            tmp_multiplications+=start[index[0]]->get_multiplications(start[index[0]]);
-        }
-        if(start[index[1]]->get_multiplications(start[index[1]])!=max_int)
-        {
-            tmp_multiplications+=start[index[1]]->get_multiplications(start[index[1]]);
-        }
-
-        int tmp_int=0;
-        tmp_int  =start[index[0]]->matrix->get_l1(start[index[0]]->matrix);
-        tmp_int *=start[index[0]]->matrix->get_l2(start[index[0]]->matrix);
-        tmp_int *=start[index[1]]->matrix->get_l2(start[index[1]]->matrix);
-
-        tmp_multiplications+=tmp_int;
-
-        if(start[index[2]]->get_multiplications(start[index[2]]) >= tmp_multiplications)
-        {
-            start[index[2]]->set_element(start[index[2]],
-                                         start[index[0]],
-                                         start[index[1]] );
-        }
-
-    }
-
-    void show(element* start)
-    {
-        cout<<"\n---------\n";
-        cout<<"total multiplications: "<<start->get_multiplications(start)<<"\n\n";
-        start->matrix->show(start->matrix);
-        cout<<"show path:\n\t";
-        start->bst_path->show(start->bst_path);
-        cout<<"\n---------\n\n";
-    }
-};
-
-d** set_matrices()
-{
-    int* l=new int[mat_count+1];
-     l[0]= 5;
-     l[1]= 2;
-     l[2]= 3;
-     l[3]= 4;
-     l[4]= 6;
-     l[5]= 7;
-     l[6]= 8;
-
-     d** matrices=new d*[mat_count];
-
-     for(int i=0; i<mat_count; i++)
-     {
-         int l1=l[i];
-         int l2=l[i+1];
-         int* arr=NULL;
-
-
-         arr=new int[l1*l2];
-         int tmp=(l1*l2)+11;
-         for(int i=0; i<l1*l2; i++)
-         {
-             arr[i]=((((i*17)+((i*37)*43)/(19))<<2)*23*tmp+tmp+7)%10;
-             tmp=(tmp*29)%97;
-         }
-
-         matrices[i]=new d(l1, l2, arr);
-     }
-
-     for(int i=0; i<mat_count; i++)
-     {
-         cout<<"marix_"<<i<<": \n";
-         matrices[i]->show(matrices[i]);
-     }
-
-     return matrices;
-}
-
-element* mcm(d**& matrices, int count)      //matrix chain multiplication
+//redefine this function, and make a function to give initial values.
+bst* make_optimal_bst(bst** start, int n_count)      //matrix chain multiplication
 {
     element** table=new element*[count*count];
     for(int i=0; i<count*count; i++)
@@ -289,30 +164,19 @@ element* mcm(d**& matrices, int count)      //matrix chain multiplication
     return table[(0*count) + count-1];
 }
 
-int main(void)
-{
-    d** matrices=set_matrices();
-    element* output=mcm(matrices, mat_count);
 
-    cout<<"\n\n\nmultiplication result:\n";
-    output->show(output);
-
-    return 0;
-}
-
-*/
 
 
 int main(void)
 {
 
-    data** d_start=new data*[4];
+    data** d_start=new data*[nodes_count];
     d_start[0]=new data(0, 3.0/8);
     d_start[1]=new data(1, 3.0/8);
     d_start[2]=new data(2, 1.0/8);
     d_start[3]=new data(3, 1.0/8);
 
-    bst** start=new bst*[5];
+    bst** start=new bst*[nodes_count];
 
     start[3]->set(start[3], NULL, NULL, d_start[3]);
     start[2]->set(start[2], NULL, start[3], d_start[2]);
