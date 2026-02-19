@@ -137,37 +137,36 @@ public:
 
 
 
-/*
+
 //redefine this function, and make a function to give initial values.
-bst* make_optimal_bst(bst** start, int n_count)      //matrix chain multiplication
+bst* make_optimal_bst(data**& start, int n_count)      //matrix chain multiplication
 {
-    element** table=new element*[count*count];
-    for(int i=0; i<count*count; i++)
+    bst** table=new bst*[n_count*n_count];
+    for(int i=0; i<n_count*n_count; i++)
     {
-        table[i]=new element;
+        table[i]= new bst();
     }
 
-    for(int i=0; i<count; i++)
+    for(int i=0; i<n_count; i++)
     {
-        int tmp_int=(i*count)+i;
-        table[tmp_int]=new element(matrices[i]);
+        int tmp_int=(i*n_count)+i;
+        table[tmp_int]=new bst(start[i]);
     }
 
-    for(int diagonal=0; diagonal<count; diagonal++)
+    for(int diagonal=0; diagonal<n_count; diagonal++)
     {
-        for(int i=0; i+diagonal<count; i++)
+        for(int i=0; i+diagonal<n_count; i++)
         {
             int j=i+diagonal;
             for(int k=i; k<j; k++)
             {
-                table[0]->get_relation(table, count, i, j, k);
+                table[0]->get_relation(table, n_count, i, j, k);
             }
         }
     }
 
-    return table[(0*count) + count-1];
+    return table[(0*n_count) + n_count-1];
 }
-*/
 
 void set_initial_values(data**& d_start, int counter)
 {
