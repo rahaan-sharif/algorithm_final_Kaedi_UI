@@ -56,7 +56,6 @@ public:
     }
 };
 
-//checked.
 class bst              //binary search tree
 {
 private:
@@ -65,7 +64,7 @@ private:
 
     float sum_probabilities(bst*& start, int i)
     {
-        if(start==NULL)
+        if(start==NULL || start->dp==NULL)
         {
             return 0;
         }
@@ -107,12 +106,17 @@ public:
 
     void show(bst*& start)
     {
+        cout<<"show function:\n";
         if(start==NULL)
         {
+            cout<<"NULL\n";
             return;
         }
         else
         {
+            start->dp->show(start->dp);
+
+
             cout<<"( ";
             if(start->left!=NULL)
             {
@@ -131,6 +135,31 @@ public:
             cout<<" ) ";
 
         }
+    }
+
+    //should be redefined.
+    void get_relation(bst**& start, int count_in,
+                      int i, int j, int k)
+    {
+        int index[3]={0};
+        index[0]=(i*count_in)+k-1;
+        index[1]=((k+1)*count_in)+j;
+        index[2]=(i*count_in)+j;
+
+        float tmp_sum_count=0;
+
+        tmp_sum_count += start[index[0]]->sum_probabilities(start[index[0]], 1);
+        tmp_sum_count += start[index[1]]->sum_probabilities(start[index[1]], 1);
+
+        if(start[index[2]]->sum_probabilities(start[index[2]], 1) >= tmp_sum_count)
+        {
+
+            int index_dpi=(i*count_in)+i; //diagonal_position_index
+            start[index[2]]->set(start[index[0]], start[index[1]],
+                                 start[index[2]], start[index_dpi]->dp);
+
+        }
+
     }
 
 };
@@ -153,13 +182,15 @@ bst* make_optimal_bst(data**& start, int n_count)      //matrix chain multiplica
         table[tmp_int]=new bst(start[i]);
     }
 
+    cout<<"before main part.\n";
     for(int diagonal=0; diagonal<n_count; diagonal++)
     {
         for(int i=0; i+diagonal<n_count; i++)
         {
             int j=i+diagonal;
-            for(int k=i; k<j; k++)
+            for(int k=i+1; k<=j; k++)
             {
+                cout<<"before get_relation.\n";
                 table[0]->get_relation(table, n_count, i, j, k);
             }
         }
@@ -219,6 +250,11 @@ int main(void)
         d_start[i]->show(d_start[i]);
     }
 
+
+    bst* output=NULL;
+    output=make_optimal_bst(d_start, nodes_count);
+    cout<<"before final\n";
+    output->show(output);
 
     /*bst** start=new bst*[nodes_count];
 
