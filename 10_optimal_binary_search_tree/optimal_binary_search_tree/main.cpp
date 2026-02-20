@@ -146,6 +146,11 @@ public:
         index[1]=((k+1)*count_in)+j;
         index[2]=(i*count_in)+j;
 
+        cout<<"\t\t\tindex[0]: "<<index[0]<<endl;
+        cout<<"\t\t\tindex[1]: "<<index[1]<<endl;
+        cout<<"\t\t\tindex[2]: "<<index[2]<<endl;
+        cout<<endl;
+
         float tmp_sum_count=0;
 
         tmp_sum_count += start[index[0]]->sum_probabilities(start[index[0]], 1);
@@ -182,17 +187,24 @@ bst* make_optimal_bst(data**& start, int n_count)      //matrix chain multiplica
         table[tmp_int]=new bst(start[i]);
     }
 
+    cout<<"***********************************************\n";
     cout<<"before main part.\n";
     for(int diagonal=0; diagonal<n_count; diagonal++)
     {
+        cout<<"diagonal: "<<diagonal<<endl;
         for(int i=0; i+diagonal<n_count; i++)
         {
             int j=i+diagonal;
+
+            cout<<"\ti: "<<i<<endl;
+            cout<<"\tj: "<<j<<endl;
             for(int k=i+1; k<=j; k++)
             {
-                cout<<"before get_relation.\n";
+                cout<<"\t\tk: "<<k<<endl;
                 table[0]->get_relation(table, n_count, i, j, k);
             }
+
+            cout<<endl<<endl<<endl;
         }
     }
 
@@ -251,6 +263,7 @@ int main(void)
     }
 
 
+    cout<<"\n\n\n\n\n";
     bst* output=NULL;
     output=make_optimal_bst(d_start, nodes_count);
     cout<<"before final\n";
