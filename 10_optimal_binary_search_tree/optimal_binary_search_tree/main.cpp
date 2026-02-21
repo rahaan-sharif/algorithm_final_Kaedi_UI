@@ -62,7 +62,7 @@ private:
     data* dp; //data pointe
     bst* left, *right;
 
-    float sum_probabilities(bst*& start, int i)
+    float sum_probabilities(bst* start, int i)
     {
         if(start==NULL || start->dp==NULL)
         {
@@ -87,15 +87,26 @@ public:
         left=NULL;
     }
 
-    void set(bst*& start1, bst* start2, bst* start3, data*& dpi)
+    void set(bst*& start1, bst* start2, bst* start3, data* dpi)
     {
+        cout<<"set function:\n";
         start1=new bst(dpi);
 
         start1->left=start2;
         start1->right=start3;
+
+        cout<<"before condition:\n";
+        if(start1==NULL)
+        {
+            cout<<"it is null\n";
+        }
+        else
+        {
+            cout<<"it is not null\n";
+        }
     }
 
-    float get_sc(bst*& start)  //sc=search count
+    float get_sc(bst* start)  //sc=search count
     {
         float output=0;
         output += start->left->sum_probabilities(start->left, 2);
@@ -104,7 +115,7 @@ public:
         return output;
     }
 
-    void show(bst*& start)
+    void show(bst* start)
     {
         cout<<"show function:\n";
         if(start==NULL)
@@ -146,6 +157,26 @@ public:
         index[1]=((k+1)*count_in)+j;
         index[2]=(i*count_in)+j;
 
+        if(index[2]==(i*count_in)+i)
+        {
+            return;
+        }
+
+        if(index[0]<0)
+        {
+            index[0]=count_in;
+            cout<<"negative index[0]: "<<index[0]<<endl;
+            //start[index[0]]->show(start[index[0]]);
+
+        }
+
+        if(index[1]>=count_in*count_in)
+        {
+            index[1]=count_in;
+            cout<<"out of border index[1]: "<<index[1]<<endl;
+            //start[index[1]]->show(start[index[1]]);
+        }
+
         cout<<"\t\t\tindex[0]: "<<index[0]<<endl;
         cout<<"\t\t\tindex[1]: "<<index[1]<<endl;
         cout<<"\t\t\tindex[2]: "<<index[2]<<endl;
@@ -160,10 +191,16 @@ public:
         {
 
             int index_dpi=(i*count_in)+i; //diagonal_position_index
-            start[index[2]]->set(start[index[0]], start[index[1]],
-                                 start[index[2]], start[index_dpi]->dp);
+            cout<<"before set function:\n";
+            start[index[2]]->set(start[index[2]], start[index[0]],
+                                 start[index[1]], start[index_dpi]->dp);
 
         }
+
+        cout<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
+        cout<<"show index[2]:\n";
+        start[index[2]]->show(start[index[2]]);
+        cout<<"\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
 
     }
 
@@ -171,8 +208,6 @@ public:
 
 
 
-
-//redefine this function, and make a function to give initial values.
 bst* make_optimal_bst(data**& start, int n_count)      //matrix chain multiplication
 {
     bst** table=new bst*[n_count*n_count];
@@ -198,7 +233,7 @@ bst* make_optimal_bst(data**& start, int n_count)      //matrix chain multiplica
 
             cout<<"\ti: "<<i<<endl;
             cout<<"\tj: "<<j<<endl;
-            for(int k=i+1; k<=j; k++)
+            for(int k=i; k<=j; k++)
             {
                 cout<<"\t\tk: "<<k<<endl;
                 table[0]->get_relation(table, n_count, i, j, k);
